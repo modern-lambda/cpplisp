@@ -256,7 +256,7 @@ namespace cpplisp {
   requires ((N < _list_len<Cons<T, U>*>::value) && listp_v<Cons<T, U>*>)
 #else
   template <std::size_t N, typename T, typename U,
-    typename WithInListRange = std::enable_if_t<(N < _list_len<Cons<T, U>* >::value) && listp_v<Cons<T, U>* >>>
+            typename WithInListRange = std::enable_if_t<(N < _list_len<Cons<T, U>* >::value) && listp_v<Cons<T, U>* >>>
 #endif
     auto nth(Cons<T, U>* lst) -> typename _nth_t<N, Cons<T, U>* >::type {
     return _nth<N>()(lst);
@@ -444,7 +444,7 @@ namespace cpplisp {
   requires (listp_v<Cons<T, U>*>&& listp_v<Cons<S, Y>*>)
 #else
   template <typename T, typename U, typename S, typename Y,
-    typename BothProperLists = std::enable_if_t<listp_v<Cons<T, U>*>&& listp_v<Cons<S, Y>*>>>
+            typename BothProperLists = std::enable_if_t<listp_v<Cons<T, U>*>&& listp_v<Cons<S, Y>*>>>
 #endif
     auto append(Cons<T, U>* a, Cons<S, Y>* b) {
     return _append(a, b);
@@ -483,7 +483,7 @@ namespace cpplisp {
   requires listp_v<Cons<T, U>*>
 #else
   template <typename T, typename U,
-    typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>>
+            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>>
 #endif
     auto reverse(Cons<T, U>* lst) {
     return _reverse(lst);
@@ -541,7 +541,7 @@ namespace cpplisp {
   requires listp_v<Cons<T, U>*>
 #else
   template <typename F, typename T, typename U,
-    typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>>
+            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>>
 #endif
     auto mapcar(F fn, Cons<T, U>* lst) {
     return _mapcar(fn, lst);
@@ -551,7 +551,7 @@ namespace cpplisp {
   requires listp_v<Cons<T, U>*>
 #else
   template <typename F, typename T, typename U,
-    typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>, typename ...S>
+            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>, typename ...S>
 #endif
     auto mapcar(F fn, Cons<T, U>* lst, S... rest) {
     return _mapcar(fn, lst, rest...);
@@ -668,8 +668,10 @@ namespace cpplisp {
   template <typename T, typename U, typename F>
   requires std::is_same_v<lambda_type<F>::arg_type, Cons<T, U>*>
 #else
+  template< class T, class U >
+  constexpr bool is_same_v = std::is_same<T, U>::value;
   template <typename T, typename U, typename F,
-    typename ArgTypesMatch = std::enable_if_t<std::is_same_v<lambda_type<F>::arg_type, Cons<T, U>*>>>
+            typename ArgTypesMatch = std::enable_if_t<cpplisp::is_same_v<lambda_type<F>::arg_type, Cons<T, U>*>>>
 #endif
     auto apply(F fn, Cons<T, U>* lst) -> typename lambda_type<F>::return_type {
     return _apply(fn, lst, std::make_index_sequence<lambda_type<F>::arity>());
