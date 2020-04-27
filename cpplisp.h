@@ -136,7 +136,8 @@ namespace cpplisp {
     return _consp<T>::value;
   }
 
-  template <typename T> constexpr bool consp_v = _consp<T>::value;
+  template <typename T>
+  constexpr bool consp_v = _consp<T>::value;
 
   template <typename... T>
   struct _list_t {
@@ -192,7 +193,8 @@ namespace cpplisp {
   inline bool listp(T) {
     return _listp<T>::value;
   }
-  template <typename T> constexpr bool listp_v = _listp<T>::value;
+  template <typename T>
+  constexpr bool listp_v = _listp<T>::value;
 
   template <typename T>
   struct _list_len {
@@ -216,7 +218,8 @@ namespace cpplisp {
   // This requires Concepts TS (Available in GCC >= 6.1 with flag `-fconcepts`)
   requires listp_v<Cons<T, U>* >
 #else
-  template <typename T, typename U, typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>* >>>
+  template <typename T, typename U,
+            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>* >>>
 #endif
   inline constexpr int length(Cons<T, U>* l) {
     return _list_len<Cons<T, U>* >::value;
@@ -253,7 +256,7 @@ namespace cpplisp {
 
 #ifdef __HAS_CONCEPTS__
   template <std::size_t N, typename T, typename U>
-  requires ((N < _list_len<Cons<T, U>*>::value) && listp_v<Cons<T, U>*>)
+  requires ((N < _list_len<Cons<T, U>* >::value) && listp_v<Cons<T, U>* >)
 #else
   template <std::size_t N, typename T, typename U,
             typename WithInListRange = std::enable_if_t<(N < _list_len<Cons<T, U>* >::value) && listp_v<Cons<T, U>* >>>
@@ -270,7 +273,8 @@ namespace cpplisp {
   inline bool nullp(T) {
     return _nullp<T>::value;
   }
-  template <typename T> constexpr bool nullp_v = _nullp<T>::value;
+  template <typename T>
+  constexpr bool nullp_v = _nullp<T>::value;
 
 
   inline std::ostream& operator<<(std::ostream& os, Cons<nullptr_t, nullptr_t>*) {
@@ -334,7 +338,7 @@ namespace cpplisp {
     static List<T>* Nil() { return nullptr; }
 
     bool equals(List<T>& b,
-      std::function<bool(T, T)> pred = [](T a, T b) { return a == b; }) {
+                std::function<bool(T, T)> pred = [](T a, T b) { return a == b; }) {
       if (length(this) != length(b)) {
         return false;
       }
@@ -435,16 +439,16 @@ namespace cpplisp {
     return a;
   }
   template <typename T, typename U, typename S, typename Y,
-    typename R = typename _append_t<Cons<T, U>*, Cons<S, Y>*>::type>
+            typename R = typename _append_t<Cons<T, U>*, Cons<S, Y>* >::type>
     R _append(Cons<T, U>* a, Cons<S, Y>* b) {
     return cons(car(a), _append(cdr(a), b));
   }
 #ifdef __HAS_CONCEPTS__
   template <typename T, typename U, typename S, typename Y>
-  requires (listp_v<Cons<T, U>*>&& listp_v<Cons<S, Y>*>)
+  requires (listp_v<Cons<T, U>* >&& listp_v<Cons<S, Y>* >)
 #else
   template <typename T, typename U, typename S, typename Y,
-            typename BothProperLists = std::enable_if_t<listp_v<Cons<T, U>*>&& listp_v<Cons<S, Y>*>>>
+            typename BothProperLists = std::enable_if_t<listp_v<Cons<T, U>* >&& listp_v<Cons<S, Y>* >>>
 #endif
     auto append(Cons<T, U>* a, Cons<S, Y>* b) {
     return _append(a, b);
@@ -460,30 +464,30 @@ namespace cpplisp {
     using type = nil_t;
   };
   template <typename T>
-  struct _reverse_t <Cons<T, nil_t>*> {
+  struct _reverse_t <Cons<T, nil_t>* > {
     using type = Cons<T, nil_t>*;
   };
   template <typename T, typename U>
-  struct _reverse_t <Cons<T, Cons<U, nil_t>* >*> {
-    using type = Cons<U, Cons<T, nil_t>*>*;
+  struct _reverse_t <Cons<T, Cons<U, nil_t>* >* > {
+    using type = Cons<U, Cons<T, nil_t>* >*;
   };
   template <typename T, typename U>
-  struct _reverse_t <Cons<T, U>*> {
+  struct _reverse_t <Cons<T, U>* > {
     using type = typename _append_t<typename _reverse_t<U>::type, Cons<T, nil_t>* >::type;
   };
   inline nil_t _reverse(nil_t) {
     return nil;
   }
-  template <typename T, typename U, typename R = typename _reverse_t<Cons<T, U>*>::type>
+  template <typename T, typename U, typename R = typename _reverse_t<Cons<T, U>* >::type>
   R _reverse(Cons<T, U>* lst) {
     return append(_reverse(cdr(lst)), list(car(lst)));
   }
 #ifdef __HAS_CONCEPTS__
   template <typename T, typename U>
-  requires listp_v<Cons<T, U>*>
+  requires listp_v<Cons<T, U>* >
 #else
   template <typename T, typename U,
-            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>>
+            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>* >>>
 #endif
     auto reverse(Cons<T, U>* lst) {
     return _reverse(lst);
@@ -497,11 +501,11 @@ namespace cpplisp {
     using type = nil_t;
   };
   template <typename F, typename T>
-  struct _mapcar_t<F, Cons<T, nil_t>*> {
+  struct _mapcar_t<F, Cons<T, nil_t>* > {
     using type = Cons<typename std::result_of<F& (T)>::type, nil_t>*;
   };
   template <typename F, typename T, typename U>
-  struct _mapcar_t<F, Cons<T, U>*> {
+  struct _mapcar_t<F, Cons<T, U>* > {
     using type = Cons<typename std::result_of<F& (T)>::type, typename _mapcar_t<F, U>::type>*;
   };
   template <typename F, typename ...S>
@@ -538,20 +542,20 @@ namespace cpplisp {
   }
 #ifdef __HAS_CONCEPTS__
   template <typename F, typename T, typename U>
-  requires listp_v<Cons<T, U>*>
+  requires listp_v<Cons<T, U>* >
 #else
   template <typename F, typename T, typename U,
-            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>>
+            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>* >>>
 #endif
     auto mapcar(F fn, Cons<T, U>* lst) {
     return _mapcar(fn, lst);
   }
 #ifdef __HAS_CONCEPTS__
   template <typename F, typename T, typename U, typename ...S>
-  requires listp_v<Cons<T, U>*>
+  requires listp_v<Cons<T, U>* >
 #else
   template <typename F, typename T, typename U,
-            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>, typename ...S>
+            typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>* >>, typename ...S>
 #endif
     auto mapcar(F fn, Cons<T, U>* lst, S... rest) {
     return _mapcar(fn, lst, rest...);
@@ -637,7 +641,7 @@ namespace cpplisp {
     typename _list_t<Ss ...>::type>::value&&
     _listp<Cons<T, U>* >::value
 #else
-  template <typename T, typename U, typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>*>>, typename ... Ss>
+  template <typename T, typename U, typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>* >>, typename ... Ss>
 #endif
   auto multiple_value_bind(Cons<T, U>* c, Ss ... sym) {
     if (!std::is_same<typename _values_t<Cons<T, U>* >::type,
@@ -666,12 +670,12 @@ namespace cpplisp {
   }
 #ifdef __HAS_CONCEPTS__
   template <typename T, typename U, typename F>
-  requires std::is_same_v<lambda_type<F>::arg_type, Cons<T, U>*>
+  requires std::is_same_v<lambda_type<F>::arg_type, Cons<T, U>* >
 #else
   template< class T, class U >
   constexpr bool is_same_v = std::is_same<T, U>::value;
   template <typename T, typename U, typename F,
-            typename ArgTypesMatch = std::enable_if_t<cpplisp::is_same_v<lambda_type<F>::arg_type, Cons<T, U>*>>>
+            typename ArgTypesMatch = std::enable_if_t<cpplisp::is_same_v<lambda_type<F>::arg_type, Cons<T, U>* >>>
 #endif
     auto apply(F fn, Cons<T, U>* lst) -> typename lambda_type<F>::return_type {
     return _apply(fn, lst, std::make_index_sequence<lambda_type<F>::arity>());
