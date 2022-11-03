@@ -12,6 +12,10 @@ TEST(Cpplisp, cons) {
   var cons_1 = cons(1, 2);
   var cons_2 = cons("foo", "bar");
   var cons_3 = cons(1, "foo");
+
+  EXPECT_EQ(consp(cons_1), true);
+  EXPECT_EQ(consp(cons_2), true);
+  EXPECT_EQ(consp(cons_3), true);
 }
 
 int main(int argc, char **argv) {

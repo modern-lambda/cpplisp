@@ -62,7 +62,7 @@ namespace runtime {
   template <typename T, typename U> class Cons;
 
   template <typename T, typename U>
-  using ConsPtr = std::unique_ptr<Cons<T, U>>;
+  using ConsPtr = std::shared_ptr<Cons<T, U>>;
 
   using nil_t = ConsPtr<nullptr_t, nullptr_t>;
 
@@ -105,7 +105,7 @@ namespace runtime {
 
   template <typename T, typename U>
   inline auto cons(T&& car, U&& cdr) noexcept {
-    return std::make_unique<Cons<T, U>>(
+    return std::make_shared<Cons<T, U>>(
       std::forward<T>(car),
       std::forward<U>(cdr)
     );
