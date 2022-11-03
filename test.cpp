@@ -13,8 +13,17 @@ int main(int, char**){
     var cons_2 = cpplisp::run_time::cons("foo", "bar");
     var cons_3 = cpplisp::run_time::cons(1, "foo");
     cout << "Cons 1: " << cons_1 << endl;
+    cout << "Cons 1 car: " << cons_1->car() << endl;
     cout << "Cons 2: " << cons_2 << endl;
     cout << "Cons 3: " << cons_3 << endl;
+    cout << "car con3: " << car(cons_3) << endl;
+    //var con_ret = cons_3->set_car(23);
+//
+    //cout << "modify Cons 3: " << cons_3 << endl;
+    //cout << "con_ret: " << con_ret->car() << endl;
+    //cout << "modify Cons 3: " << cons_3 << endl;
+    //cout << "car cons 3: " << cpplisp::run_time::car(con_ret.get()) << endl;
+
 
     var list_1 = cpplisp::run_time::list(1, 2, 3);
     var list_2 = cpplisp::run_time::cons("foo", list_1);

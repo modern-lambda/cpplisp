@@ -677,7 +677,7 @@ namespace run_time {
   template< class T, class U >
   constexpr bool is_same_v = std::is_same<T, U>::value;
   template <typename T, typename U, typename F,
-            typename ArgTypesMatch = std::enable_if_t<cpplisp::run_time::is_same_v<lambda_type<F>::arg_type, Cons<T, U>* >>>
+            typename ArgTypesMatch = typename std::enable_if_t<cpplisp::run_time::is_same_v<typename lambda_type<F>::arg_type, Cons<T, U>* >>>
 #endif
     auto apply(F fn, Cons<T, U>* lst) -> typename lambda_type<F>::return_type {
     return _apply(fn, lst, std::make_index_sequence<lambda_type<F>::arity>());
