@@ -73,6 +73,19 @@ TEST(Cpplisp, car) {
   EXPECT_EQ(cadr(cons_1), "foo");
 }
 
+TEST(Cpplisp, nth) {
+  using namespace cpplisp::runtime;
+
+  var cons_1 = cons(1, cons("foo", nil));
+  var ls_1 = list(1, 2, 3);
+  var ls_2 = list(1, "bar", "foo");
+
+  var lt = list(1, "bar", std::vector<int>{1, 2, 3}, std::string("foo"));
+
+  EXPECT_EQ(nth<0>(cons_1), 1);
+  EXPECT_EQ(nth<0>(lt), 1);
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

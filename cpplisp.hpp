@@ -1,6 +1,6 @@
 // This file is distributed under the GNU GENERAL PUBLIC LICENSE.
 // See "LICENSE" for details.
-// Copyright 2018-2022, CanftIn (wwc7033@gmail.com)
+// Copyright 2020-2022, CanftIn (wwc7033@gmail.com)
 // This is an open source non-commercial project.
 
 #ifndef CPPLISP_HPP__
@@ -302,6 +302,53 @@ namespace runtime {
     return _list_len<ConsPtr<T, U>>::value;
   }
 
+  template <std::size_t N, typename T>
+  struct _nth_t { };
+
+  template <typename T, typename U>
+  struct _nth_t<0, ConsPtr<T, U>> {
+    using type = T;
+  };
+
+  template <std::size_t N, typename T, typename U>
+  struct _nth_t<N, ConsPtr<T, U>> {
+    using type = typename _nth_t<N - 1, U>::type;
+  };
+
+  template <std::size_t N>
+  struct _nth;
+
+  template <>
+  struct _nth<0> {
+    template <typename T, typename U>
+    static T position(ConsPtr<T, U> lst) {
+      return car(lst);
+    }
+  };
+
+  template <std::size_t N>
+  struct _nth {
+    template <typename T, typename U>
+    static typename _nth_t<N, ConsPtr<T, U>>::type
+    position(ConsPtr<T, U> lst) {
+      return _nth<N -1>::position(cdr(lst));
+    }
+  };
+
+  /// @brief [symbols] nth: (Squence a) => int -> a -> b
+  /// @tparam T 
+  /// @tparam U 
+  /// @tparam WithInListRange 
+  /// @tparam N 
+  /// @param lst 
+  /// @return 
+  template <std::size_t N, typename T, typename U,
+            typename WithInListRange = std::enable_if_t<(N < _list_len<ConsPtr<T, U>>::value) &&
+                                                        listp_v<ConsPtr<T, U>>>>
+  typename _nth_t<N, ConsPtr<T, U>>::type
+  nth(ConsPtr<T, U> lst) {
+    return _nth<N>::position(lst);
+  }
 
 } // namespace runtime
 
