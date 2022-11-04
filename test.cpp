@@ -16,7 +16,7 @@ int main(int, char**){
     cout << "Cons 1 car: " << cons_1->car() << endl;
     cout << "Cons 2: " << cons_2 << endl;
     cout << "Cons 3: " << cons_3 << endl;
-    cout << "car con3: " << car(cons_3) << endl;
+    cout << "listp con1: " << listp(cons_1) << endl;
     //var con_ret = cons_3->set_car(23);
 //
     //cout << "modify Cons 3: " << cons_3 << endl;
