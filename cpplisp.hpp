@@ -290,17 +290,17 @@ namespace runtime {
     static const int value = 1 + _list_len<U>::value;
   };
 
-  /// @brief [symbols] length: ConsPtr<T, U> -> int
+  /// @brief [symbols] length: (Squence a) => a -> int
   /// @tparam T 
   /// @tparam U 
   /// @tparam  
   /// @param l 
   /// @return 
-  //template <typename T, typename U,
-  //          typename IsProperList = std::enable_if_t<listp_v<ConsPtr<T, U>>>>
-  //inline constexpr int length(ConsPtr<T, U> l) {
-  //  return _list_len<ConsPtr<T, U>>::value;
-  //}
+  template <typename T, typename U,
+            typename IsProperList = std::enable_if_t<listp_v<ConsPtr<T, U>>>>
+  inline constexpr int length(ConsPtr<T, U> l) {
+    return _list_len<ConsPtr<T, U>>::value;
+  }
 
 
 } // namespace runtime

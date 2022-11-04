@@ -7,7 +7,6 @@
 
 TEST(Cpplisp, cons) {
   using namespace cpplisp::runtime;
-  using namespace std;
 
   var cons_1 = cons(1, 2);
   var cons_2 = cons("foo", "bar");
@@ -20,7 +19,6 @@ TEST(Cpplisp, cons) {
 
 TEST(Cpplisp, listp) {
   using namespace cpplisp::runtime;
-  using namespace std;
 
   var cons_1 = cons(1, 2);
   var cons_2 = cons("foo", "bar");
@@ -48,17 +46,14 @@ TEST(Cpplisp, listp) {
 
 TEST(Cpplisp, length) {
   using namespace cpplisp::runtime;
-  //using namespace std;
 
-  var cons_1 = cons(1, 2);
-  var cons_2 = cons("foo", "bar");
-  var cons_3 = cons(1, "foo");
-  std::cout << "+++++++++++++++++++++" << std::endl;
-  //std::cout << "cons1 size: " << length(cons_1) << std::endl;
+  var cons_1 = cons(1, cons("foo", nil));
+  var ls_1 = list(1, 2, 3);
+  var ls_2 = list(1, "bar", "foo");
 
-  //EXPECT_EQ(length(cons_1), 2);
-  //EXPECT_EQ(length(cons_2), 2);
-  //EXPECT_EQ(length(cons_3), 2);
+  EXPECT_EQ(length(cons_1), 2);
+  EXPECT_EQ(length(ls_1), 3);
+  EXPECT_EQ(length(ls_2), 3);
 }
 
 int main(int argc, char **argv) {
