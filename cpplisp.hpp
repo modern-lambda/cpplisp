@@ -350,6 +350,23 @@ namespace runtime {
     return _nth<N>::position(lst);
   }
 
+  template <typename T>
+  struct _nullp : std::false_type { };
+
+  template <>
+  struct _nullp<nil_t> : std::true_type { };
+
+  /// @brief [symbols] nullp
+  /// @tparam T 
+  /// @param  
+  /// @return 
+  template <typename T>
+  inline bool nullp(T) {
+    return _nullp<T>::value;
+  }
+
+
+
 } // namespace runtime
 
 

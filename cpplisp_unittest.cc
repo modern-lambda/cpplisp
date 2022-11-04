@@ -86,6 +86,21 @@ TEST(Cpplisp, nth) {
   EXPECT_EQ(nth<0>(lt), 1);
 }
 
+TEST(Cpplisp, nullp) {
+  using namespace cpplisp::runtime;
+
+  var cons_1 = cons(1, cons("foo", nil));
+  var ls_1 = list(1, 2, 3);
+  var ls_2 = list(1, "bar", "foo");
+
+  var lt = list(1, "bar", std::vector<int>{1, 2, 3}, std::string("foo"));
+
+  EXPECT_EQ(nullp(nil), true);
+  EXPECT_EQ(nullp(cddr(cons_1)), true);
+  EXPECT_EQ(nullp(cddr(lt)), false);
+  EXPECT_EQ(nullp(cddddr(lt)), true);
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
