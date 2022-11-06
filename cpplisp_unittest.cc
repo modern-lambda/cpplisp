@@ -101,6 +101,20 @@ TEST(Cpplisp, nullp) {
   EXPECT_EQ(nullp(cddddr(lt)), true);
 }
 
+TEST(Cpplisp, prettyprint) {
+  using namespace cpplisp::runtime;
+  using namespace cpplisp::runtime::prettyprint;
+
+  var cons_1 = cons(1, cons("foo", nil));
+  var ls_1 = list(1, 2, 3);
+  var ls_2 = list(1, "bar", "foo");
+
+  //var lt = list(1, "bar", std::vector<int>{1, 2, 3}, std::string("foo"));
+
+  EXPECT_EQ(to_string(cons_1), "(1 . (foo . nil))");
+  EXPECT_EQ(to_string(ls_1), "(1 . (2 . (3 . nil)))");
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

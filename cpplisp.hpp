@@ -365,7 +365,49 @@ namespace runtime {
     return _nullp<T>::value;
   }
 
+  namespace prettyprint
+  {
+    inline std::ostream& operator << (std::ostream& os, nil_t) {
+      os << "nil";
+      return os;
+    }
 
+    template <typename T>
+    inline std::ostream& operator << (std::ostream& os, ConsPtr<T, const nil_t&> c) {
+      os << "(" << car(c) << " . nil)";
+      return os;
+    }
+
+    template <typename T>
+    inline std::ostream& operator << (std::ostream& os, ConsPtr<T, nil_t&> c) {
+      os << "(" << car(c) << " . nil)";
+      return os;
+    }
+
+    template <typename T>
+    inline std::ostream& operator << (std::ostream& os, ConsPtr<T, nil_t> c) {
+      os << "(" << car(c) << " . nil)";
+      return os;
+    }
+
+    template <typename T, typename U>
+    inline std::ostream& operator << (std::ostream& os, ConsPtr<T, U> c) {
+      os << "(" << car(c);
+      if (cdr(c)) {
+        os << " . ";
+        os << cdr(c);
+      }
+      os << ")";
+      return os;
+    }
+
+    template <typename T, typename U>
+    inline std::string to_string(ConsPtr<T, U> c) {
+      std::stringstream ss;
+      ss << c;
+      return ss.str();
+    }
+  } // namespace prettyprint
 
 } // namespace runtime
 
