@@ -18,7 +18,7 @@ TEST(Cpplisp, cons) {
   EXPECT_EQ(consp(cons_3), true);
 }
 
-TEST(Cpplisp, listp) {
+TEST(Cpplisp, listp_and_consp) {
   using namespace cpplisp::runtime;
 
   var cons_1 = cons(1, 2);
@@ -37,6 +37,9 @@ TEST(Cpplisp, listp) {
   EXPECT_EQ(listp(cons_1), false);
   EXPECT_EQ(listp(cons_2), false);
   EXPECT_EQ(listp(cons_3), false);
+  EXPECT_EQ(consp(cons_1), true);
+  EXPECT_EQ(consp(cons_2), true);
+  EXPECT_EQ(consp(cons_3), true);
   EXPECT_EQ(listp(cons_4), true);
   EXPECT_EQ(listp(cons_5), true);
   EXPECT_EQ(listp(cons_6), true);
