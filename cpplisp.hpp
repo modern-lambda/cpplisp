@@ -409,6 +409,22 @@ namespace runtime {
     }
   } // namespace prettyprint
 
+  template <typename T>
+  inline bool equals(T a, T b) {
+    return a == b;
+  }
+
+  template <typename T, typename U>
+  inline bool equals(ConsPtr<T, U> lhs, ConsPtr<T, U> rhs) {
+    if (car(lhs) == car(rhs)) {
+      if (consp(cdr(lhs)) && consp(cdr(rhs))) {
+        return equals(cdr(lhs), cdr(rhs));
+      }
+      return cdr(lhs) == cdr(rhs);
+    }
+    return false;
+  }
+
 } // namespace runtime
 
 

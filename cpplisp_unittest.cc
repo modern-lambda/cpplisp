@@ -104,6 +104,7 @@ TEST(Cpplisp, nullp) {
   EXPECT_EQ(nullp(cddddr(lt)), true);
 }
 
+// TODO: need more test
 TEST(Cpplisp, prettyprint) {
   using namespace cpplisp::runtime;
   using namespace cpplisp::runtime::prettyprint;
@@ -116,6 +117,18 @@ TEST(Cpplisp, prettyprint) {
 
   EXPECT_EQ(to_string(cons_1), "(1 . (foo . nil))");
   EXPECT_EQ(to_string(ls_1), "(1 . (2 . (3 . nil)))");
+}
+
+TEST(Cpplisp, equals) {
+  using namespace cpplisp::runtime;
+
+  var cons_1 = cons(1, cons("foo", nil));
+  var cons_2 = cons(1, 2);
+  var ls_1 = list(1, 2, 3);
+  var ls_2 = list(1, "bar", "foo");
+
+  EXPECT_EQ(equals(ls_1, cons(1, cons(2, cons(3, nil)))), true);
+  EXPECT_EQ(equals(cons_2, cons(1, 2)), true);
 }
 
 int main(int argc, char **argv) {
