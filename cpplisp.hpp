@@ -490,6 +490,39 @@ namespace runtime {
     return _append(a, b);
   }
 
+  template <typename T>
+  struct _reverse_t {
+    using type = nullptr_t;
+  };
+  template <>
+  struct _reverse_t<const nil_t&> {
+    using type = const nil_t&;
+  };
+  template <typename T>
+  struct _reverse_t<ConsPtr<T, const nil_t&>> {
+    using type = ConsPtr<T, const nil_t&>;
+  };
+  template <typename T, typename U>
+  struct _reverse_t<ConsPtr<T, ConsPtr<U, const nil_t&>>> {
+    using type = ConsPtr<U, ConsPtr<T, const nil_t&>>;
+  };
+  template <typename T, typename U>
+  struct _reverse_t<ConsPtr<T, U>> {
+    using type = typename _append_t<typename _reverse_t<U>::type, ConsPtr<T, const nil_t&>>::type;
+  };
+  inline nil_t _reverse(const nil_t&) {
+    return nil;
+  }
+  template <typename T, typename U, typename R = typename _reverse_t<ConsPtr<T, U>>::type>
+  R _reverse(ConsPtr<T, U> lst) {
+    return append(_reverse(cdr(lst)), list(car(lst)));
+  }
+  template <typename T, typename U,
+            typename IsProperList = std::enable_if_t<listp_v<ConsPtr<T, U>>>>
+  auto reverse(ConsPtr<T, U> lst) {
+    return _reverse(lst);
+  }
+
 
 
 } // namespace runtime
