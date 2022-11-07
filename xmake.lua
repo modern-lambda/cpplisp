@@ -13,9 +13,9 @@ add_rules("mode.debug", "mode.release")
 add_requires("gtest")
 add_packages("gtest")
 
-target("cpplisp")
+target("cpplisp_ct")
     set_kind("binary")
-    add_files("./test.cpp")
+    add_files("./cpplisp_ct_test.cpp")
 
 target("cpplisp_unittest")
     add_files("cpplisp_unittest.cc")

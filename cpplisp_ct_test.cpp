@@ -1,50 +1,10 @@
-#include "cpplisp.h"
+#include "cpplisp_ct.h"
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-
-
 int main(int, char**){
-
-  {
-    var cons_1 = cpplisp::run_time::cons(1, 2);
-    var cons_2 = cpplisp::run_time::cons("foo", "bar");
-    var cons_3 = cpplisp::run_time::cons(1, "foo");
-    cout << "Cons 1: " << cons_1 << endl;
-    cout << "Cons 1 car: " << cons_1->car() << endl;
-    cout << "Cons 2: " << cons_2 << endl;
-    cout << "Cons 3: " << cons_3 << endl;
-    cout << "listp con1: " << listp(cons_1) << endl;
-    //var con_ret = cons_3->set_car(23);
-//
-    //cout << "modify Cons 3: " << cons_3 << endl;
-    //cout << "con_ret: " << con_ret->car() << endl;
-    //cout << "modify Cons 3: " << cons_3 << endl;
-    //cout << "car cons 3: " << cpplisp::run_time::car(con_ret.get()) << endl;
-
-
-    var list_1 = cpplisp::run_time::list(1, 2, 3);
-    var list_2 = cpplisp::run_time::cons("foo", list_1);
-    var list_3 = cpplisp::run_time::append(list_1, list_2);
-    var list_4 = cpplisp::run_time::reverse(list_1);
-    var list_5 = cpplisp::run_time::mapcar([](auto n) { return n + 1; }, list_1);
-    var list_6 = cpplisp::run_time::mapcar([](auto n, auto s) { return to_string(n) + s; }, list_1, cpplisp::run_time::list("a", "b", "c"));
-    cout << "List 1: " << list_1 << endl;
-    cout << "List 2: " << list_2 << endl;
-    cout << "List 3: " << list_3 << endl;
-    cout << "List 4: " << list_4 << endl;
-    cout << "List 5: " << list_5 << endl;
-    cout << "List 6: " << list_6 << endl;
-
-    int v1, v2, v3;
-    string v4;
-    cout << cpplisp::run_time::multiple_value_bind(cpplisp::run_time::append(list_5, cpplisp::run_time::list((string)"foo")), &v1, &v2, &v3, &v4)([=](){
-        cout << "v1: " << v1 << " v2: " << v2 << " v3: " << v3 << " v4: " << v4 << endl;
-        return cpplisp::run_time::list(v4, v1, v2, v3);
-      }) << endl;
-  } // run_time test
 
   {
     using namespace cpplisp::lib;
