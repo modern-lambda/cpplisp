@@ -643,7 +643,8 @@ namespace run_time {
     typename _list_t<Ss ...>::type>::value&&
     _listp<Cons<T, U>* >::value
 #else
-  template <typename T, typename U, typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>* >>, typename ... Ss>
+  template <typename T, typename U, 
+      typename IsProperList = std::enable_if_t<listp_v<Cons<T, U>* >>, typename ... Ss>
 #endif
   auto multiple_value_bind(Cons<T, U>* c, Ss ... sym) {
     if (!std::is_same<typename _values_t<Cons<T, U>* >::type,

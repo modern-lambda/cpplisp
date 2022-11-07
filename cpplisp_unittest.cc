@@ -182,10 +182,27 @@ TEST(Cpplisp, mapcar) {
             "(1a . (2b . (3c . nil)))");
   EXPECT_EQ(cpplisp::runtime::prettyprint::to_string(ls_5),
             "(1ae . (2bf . (3cg . nil)))");
-  //var app_ret = reverse(cons_2);
-  //EXPECT_EQ(cpplisp::runtime::prettyprint::to_string(app_ret),
-  //          "(2 . (foo . nil))");
-  //EXPECT_EQ(equals(reverse(cons_2), ls_2), true);
+}
+
+TEST(Cpplisp, multiple_value_bind) {
+  using namespace cpplisp::runtime;
+
+  var ls_1 = list(1, 2, 3);
+  var ls_2 = list(2.0, "foo");
+  var list_abc = list("a", "b", "c");
+  var list_efg = list("e", "f", "g");
+
+  int v1, v2, v3;
+  var mvb_bind = multiple_value_bind(ls_1, &v1, &v2, &v3);
+  var ls_3 = mvb_bind([=] () { return list(v1, v2, v3); });
+  //std::cout << ls_3 << std::endl;
+
+  std::string v4;
+  var ls_4 = multiple_value_bind(append(ls_1, list((std::string)"foo")), &v1, &v2, &v3, &v4)([=] () {
+    //std::cout << "v1: " << v1 << " v2: " << v2 << " v3: " << v3 << " v4: " << v4 << std::endl;
+    return list(v4, v1, v2, v3);
+  });
+  //std::cout << ls_4 << std::endl;
 }
 
 int main(int argc, char **argv) {

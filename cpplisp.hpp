@@ -592,6 +592,90 @@ namespace runtime {
     return _mapcar(fn, lst, rest...);
   }
 
+  template <typename R, typename C, bool cp, typename... As>
+  struct _lambda_type {
+    static const bool constp = cp;
+    enum { arity = sizeof...(As) };
+    using return_type = R;
+    using arg_type = typename _list_t<As...>::type;
+  };
+  template <typename L>
+  struct lambda_type : lambda_type<decltype(&L::operator())> { };
+  template <typename R, typename C, typename... As>
+  struct lambda_type<R (C::*)(As...)> : _lambda_type<R, C, false, As...> { };
+  template <typename R, typename C, typename... As>
+  struct lambda_type<R (C::*)(As...) const> : _lambda_type<R, C, true, As...> { };
+
+  template <typename T>
+  struct _values_t {
+    using type = nullptr_t;
+  };
+  template <typename T>
+  struct _values_t<ConsPtr<T, const nil_t&>> {
+    using type = ConsPtr<T*, const nil_t&>;
+  };
+  template <typename T, typename U>
+  struct _values_t<ConsPtr<T, U>> {
+    using type = ConsPtr<T*, typename _values_t<U>::type>;
+  };
+  template <typename T, typename S = typename _values_t<ConsPtr<T, const nil_t&>>::type>
+  void _mvb(ConsPtr<T, const nil_t&> lst, S sym) {
+    *(car(sym)) = car(lst);
+  }
+  template <typename T, typename U, typename S = typename _values_t<ConsPtr<T, U>>::type>
+  void _mvb(ConsPtr<T, U> lst, S sym) {
+    *(car(sym)) = car(lst);
+    _mvb(cdr(lst), cdr(sym));
+  }
+  template <typename L>
+  struct get_return : get_return<decltype(&L::operator())> { };
+  template <typename C, typename... A>
+  struct get_return<void (C::*)(A...)> {
+    template <typename L>
+    ConsPtr<bool, nullptr_t> operator () (L fn) {
+      fn();
+      return cons(false, nullptr);
+    }
+  };
+  template <typename R, typename C, typename... A>
+  struct get_return<R (C::*)(A...)> {
+    template <typename L>
+    ConsPtr<bool, R> operator () (L fn) {
+      return cons(true, fn());
+    }
+  };
+  template <typename C, typename... A>
+  struct get_return<void (C::*)(A...) const> {
+    template <typename L>
+    ConsPtr<bool, nullptr_t> operator () (L fn) {
+      fn();
+      return cons(false, nullptr);
+    }
+  };
+  template <typename R, typename C, typename... A>
+  struct get_return<R (C::*)(A...) const> {
+    template <typename L>
+    ConsPtr<bool, R> operator () (L fn) {
+      return cons(true, fn());
+    }
+  };
+  template <typename T, typename U, typename... Ss,
+            typename IsProperList = std::enable_if_t<listp_v<ConsPtr<T, U>>>>
+  auto multiple_value_bind(ConsPtr<T, U> c, Ss&&... sym) {
+    using sym_lst_t = typename _values_t<ConsPtr<T, U>>::type;
+    sym_lst_t sym_lst = list(std::forward<Ss>(sym)...);
+    auto orig = mapcar([](auto p) { return *p; }, sym_lst);
+    _mvb(c, sym_lst);
+    return [orig, sym_lst] (auto fn) {
+      auto retval = get_return<decltype(fn)>()(fn);
+      _mvb(orig, sym_lst);
+      if (car(retval)) {
+        return cdr(retval);
+      }
+      typename _cdr_t<decltype(retval)>::type ret = 0;
+      return ret;
+    };
+  }
 } // namespace runtime
 
 
