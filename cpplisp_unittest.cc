@@ -163,6 +163,31 @@ TEST(Cpplisp, reverse) {
   EXPECT_EQ(equals(reverse(cons_2), ls_2), true);
 }
 
+TEST(Cpplisp, mapcar) {
+  using namespace cpplisp::runtime;
+
+  var ls_1 = list(1, 2, 3);
+  //var ls_2 = list(2.0, "foo");
+  var list_abc = list("a", "b", "c");
+  var list_efg = list("e", "f", "g");
+
+  var ls_3 = mapcar([](auto n) { return n + 1; }, ls_1);
+  var ls_4 = mapcar([](auto n, auto s) { return std::to_string(n) + s; }, 
+                    ls_1, list_abc);
+  var ls_5 = mapcar([](auto n, auto s1, auto s2) { return std::to_string(n) + s1 + s2; }, 
+                    ls_1, list_abc, list_efg);
+  EXPECT_EQ(cpplisp::runtime::prettyprint::to_string(ls_3),
+            "(2 . (3 . (4 . nil)))");
+  EXPECT_EQ(cpplisp::runtime::prettyprint::to_string(ls_4),
+            "(1a . (2b . (3c . nil)))");
+  EXPECT_EQ(cpplisp::runtime::prettyprint::to_string(ls_5),
+            "(1ae . (2bf . (3cg . nil)))");
+  //var app_ret = reverse(cons_2);
+  //EXPECT_EQ(cpplisp::runtime::prettyprint::to_string(app_ret),
+  //          "(2 . (foo . nil))");
+  //EXPECT_EQ(equals(reverse(cons_2), ls_2), true);
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

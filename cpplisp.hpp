@@ -225,6 +225,11 @@ namespace runtime {
     using type = nil_t;
   };
 
+  template <>
+  struct _car_t<const nil_t&> {
+    using type = const nil_t&;
+  };
+
   template <typename T, typename U>
   struct _car_t<ConsPtr<T, U>> {
     using type = T;
@@ -236,6 +241,11 @@ namespace runtime {
   template <>
   struct _cdr_t<nil_t> {
     using type = nil_t;
+  };
+
+  template <>
+  struct _cdr_t<const nil_t&> {
+    using type = const nil_t&;
   };
 
   template <typename T, typename U>
@@ -523,7 +533,64 @@ namespace runtime {
     return _reverse(lst);
   }
 
-
+  template <typename T, typename U, typename... Us>
+  struct _mapcar_t { };
+  template <typename F>
+  struct _mapcar_t<F, const nil_t&> {
+    using type = const nil_t&;
+  };
+  template <typename F, typename T>
+  struct _mapcar_t<F, ConsPtr<T, const nil_t&>> {
+    using type = ConsPtr<typename std::result_of<F& (T)>::type, const nil_t&>;
+  };
+  template <typename F, typename T, typename U>
+  struct _mapcar_t<F, ConsPtr<T, U>> {
+    using type = ConsPtr<typename std::result_of<F& (T)>::type,
+                         typename _mapcar_t<F, U>::type>;
+  };
+  template <typename F, typename... S>
+  struct _packed_result_t {
+    using type = typename std::result_of<F& (S...)>::type;
+  };
+  template <typename F, typename T, typename... S>
+  struct _mapcar_t<F, ConsPtr<T, const nil_t&>, S...> {
+    using type = ConsPtr<typename _packed_result_t<F, T, typename _car_t<S>::type...>::type,
+                         const nil_t&>;
+  };
+  template <typename F, typename T, typename U, typename... S>
+  struct _mapcar_t<F, ConsPtr<T, U>, S...> {
+    using type = ConsPtr<typename _packed_result_t<F, T, typename _car_t<S>::type...>::type,
+                         typename _mapcar_t<F, U, typename _cdr_t<S>::type...>::type>;
+  };
+  template <typename F, typename T>
+  auto _mapcar(F fn, ConsPtr<T, const nil_t&> lst) {
+    return list(fn(car(lst)));
+  }
+  template <typename F, typename T, typename U,
+            typename R = typename _mapcar_t<F, ConsPtr<T, U>>::type>
+  R _mapcar(F fn, ConsPtr<T, U> lst) {
+    return cons(fn(car(lst)), _mapcar(fn, cdr(lst)));
+  }
+  template <typename F, typename T, typename... S,
+            typename R = typename _mapcar_t<F, ConsPtr<T, const nil_t&>, S...>::type>
+  R _mapcar(F fn, ConsPtr<T, const nil_t&> lst, S... rest) {
+    return list(fn(car(lst), car(rest)...));
+  };
+  template <typename F, typename T, typename U, typename... S,
+            typename R = typename _mapcar_t<F, ConsPtr<T, U>, S...>::type>
+  R _mapcar(F fn, ConsPtr<T, U> lst, S... rest) {
+    return cons(fn(car(lst), car(rest)...), _mapcar(fn, cdr(lst), cdr(rest)...));
+  };
+  template <typename F, typename T, typename U,
+            typename IsProperList = std::enable_if_t<listp_v<ConsPtr<T, U>>>>
+  auto mapcar(F fn, ConsPtr<T, U> lst) {
+    return _mapcar(fn, lst);
+  }
+  template <typename F, typename T, typename U, typename... S,
+            typename IsProperList = std::enable_if_t<listp_v<ConsPtr<T, U>>>>
+  auto mapcar(F fn, ConsPtr<T, U> lst, S... rest) {
+    return _mapcar(fn, lst, rest...);
+  }
 
 } // namespace runtime
 
