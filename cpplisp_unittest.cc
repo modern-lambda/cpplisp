@@ -131,6 +131,22 @@ TEST(Cpplisp, equals) {
   EXPECT_EQ(equals(cons_2, cons(1, 2)), true);
 }
 
+TEST(Cpplisp, append) {
+  using namespace cpplisp::runtime;
+
+  var cons_1 = cons(1, nil);
+  var cons_2 = cons("foo", cons(2.0, nil));
+  var ls_1 = list(1, 2, 3);
+  var ls_2 = list(1, "foo", 2.0);
+
+  EXPECT_EQ(listp(cons_1), true);
+  EXPECT_EQ(listp(cons_2), true);
+  var app_ret = append(cons_1, cons_2);
+  EXPECT_EQ(cpplisp::runtime::prettyprint::to_string(app_ret),
+            "(1 . (foo . (2 . nil)))");
+  EXPECT_EQ(equals(append(cons_1, cons_2), ls_2), true);
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

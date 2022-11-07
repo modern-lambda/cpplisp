@@ -425,6 +425,73 @@ namespace runtime {
     return false;
   }
 
+  // single type list-of
+  template <typename T, typename U>
+  struct _list_of : std::false_type { };
+  template <typename T>
+  struct _list_of<T, ConsPtr<T, nil_t>> : std::true_type { };
+  template <typename T, typename S>
+  struct _list_of<T, ConsPtr<T, S>> : _list_of<T, S> { };
+  template <typename T, typename U>
+  constexpr bool list_of_v = _list_of<T, U>::value;
+
+  template <typename T, typename U>
+  struct _m_list_of : std::false_type { };
+  template <typename T>
+  struct _m_list_of<T, ConsPtr<T, nil_t>> : std::true_type { };
+  template <typename T, typename U>
+  struct _m_list_of<T, ConsPtr<U, nil_t>> : _m_list_of<T, U> { };
+  template <typename T, typename S>
+  struct _m_list_of<T, ConsPtr<T, S>> : _m_list_of<T, S> { };
+  template <typename T, typename U, typename S>
+  struct _m_list_of<T, ConsPtr<U, S>> {
+    static const bool value = _m_list_of<T, U>::value && _m_list_of<T, S>::value;
+  };
+  template <typename T, typename U>
+  constexpr bool m_list_of_v = _m_list_of<T, U>::value;
+
+  template <typename T, typename U>
+  struct _append_t {
+    using type = nullptr_t;
+  };
+  template <typename T, typename U>
+  struct _append_t<const nil_t&, ConsPtr<T, U>> {
+    using type = ConsPtr<T, U>;
+  };
+  template <typename T, typename U>
+  struct _append_t<ConsPtr<T, U>, const nil_t&> {
+    using type = ConsPtr<T, U>;
+  };
+  template <typename T, typename S, typename Y>
+  struct _append_t<T, ConsPtr<S, Y>> {
+    using type = ConsPtr<T, ConsPtr<S,Y>>;
+  };
+  template <typename T, typename S, typename Y>
+  struct _append_t<ConsPtr<T, const nil_t&>, ConsPtr<S, Y>> {
+    using type = ConsPtr<T, ConsPtr<S, Y>>;
+  };
+  template <typename T, typename U, typename S, typename Y>
+  struct _append_t<ConsPtr<T, U>, ConsPtr<S, Y>> {
+    using type = ConsPtr<T, typename _append_t<U, ConsPtr<S, Y>>::type>;
+  };
+  template <typename S, typename Y>
+  inline ConsPtr<S, Y> _append(const nil_t&, ConsPtr<S, Y> b) { return b; }
+  template <typename T, typename U>
+  inline ConsPtr<T, U> _append(ConsPtr<T, U> a, const nil_t&) { return a; }
+  template <typename T, typename U, typename S, typename Y,
+            typename R = typename _append_t<ConsPtr<T, U>, ConsPtr<S, Y>>::type>
+  R _append(ConsPtr<T, U> a, ConsPtr<S, Y> b) {
+    return cons(car(a), _append(cdr(a), b));
+  }
+  template <typename T, typename U, typename S, typename Y,
+            typename BothProperLists = std::enable_if_t<listp_v<ConsPtr<T, U>> &&
+                                                        listp_v<ConsPtr<S, Y>>>>
+  auto append(ConsPtr<T, U> a, ConsPtr<S, Y> b) {
+    return _append(a, b);
+  }
+
+
+
 } // namespace runtime
 
 
